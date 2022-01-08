@@ -1,3 +1,5 @@
+import { signInWithGoogle, signOut, useUserState } from './firebase.js';
+
 const days = ['M', 'Tu', 'W', 'Th', 'F'];
 export const terms = { F: 'Fall', W: 'Winter', S: 'Spring'};
 
@@ -14,16 +16,36 @@ const TermButton = ({term, setTerm, checked}) => (
       </label>
     </>
 );
-  
-export const TermSelector = ({term, setTerm}) => (
-    <div className="btn-group">
-    { 
-      Object.values(terms).map(value => (
-        <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
-      ))
-    }
-    </div>
+
+const SignInButton = () => (
+    <button className="btn btn-secondary btn-sm"
+        onClick={() => signInWithGoogle()}>
+      Sign In
+    </button>
 );
+
+const SignOutButton = () => (
+    <button className="btn btn-secondary btn-sm"
+        onClick={() => signOut()}>
+      Sign Out
+    </button>
+);
+  
+export const TermSelector = ({term, setTerm}) => {
+    const [user] = useUserState();
+    return (
+      <div className="btn-toolbar justify-content-between">
+        <div className="btn-group">
+        { 
+          Object.values(terms).map(
+            value => <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
+          )
+        }
+        </div>
+        { user ? <SignOutButton /> : <SignInButton /> }
+      </div>
+    );
+  };
 
 const meetsPat = /^ *((?:M|Tu|W|Th|F)+) +(\d\d?):(\d\d) *[ -] *(\d\d?):(\d\d) *$/;
 
